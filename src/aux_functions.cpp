@@ -38,8 +38,12 @@ Vector2 generateRandomVelocity()
     std::random_device dev;
     std::mt19937 rng(dev());
     std::uniform_real_distribution<float> dist(ASTEROID_MIN_VELOCITY, ASTEROID_MAX_VELOCITY);
+    std::uniform_int_distribution<int> dist_sign(-1,1);
 
-    Vector2 generated_velocity { dist(rng), dist(rng) };
+    int x_sign = (dist_sign(rng) >= 0) ? 1 : -1;
+    int y_sign = (dist_sign(rng) >= 0) ? 1 : -1;
+
+    Vector2 generated_velocity { x_sign*dist(rng), y_sign*dist(rng) };
 
     return generated_velocity;
 }
