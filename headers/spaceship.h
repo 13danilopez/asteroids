@@ -14,6 +14,7 @@ protected:
     Vector2 velocity;
     float angle;
     std::array<Vector2,3> vertices;
+    bool invulnerable;
 
 private:
     void limitShipVelocity();
@@ -34,6 +35,9 @@ public:
     void setVelocity_x(float nv_x);
     void setVelocity_y(float nv_y);
     void setAngle(float na);
+    void setInvulnerable(bool ns);
+
+    bool isInvulnerable();
 
     void rotateLeft(float dt);
     void rotateRight(float dt);

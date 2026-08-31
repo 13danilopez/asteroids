@@ -24,8 +24,10 @@ protected:
     unsigned int wave;
     double last_bullet_time;
     double last_gameover_time;
+    double last_ship_grace_time;
     unsigned int score;
     float score_mult;
+    unsigned int lives;
     bool running;
 
 private:
@@ -45,7 +47,7 @@ private:
     void shootBullet();
 
     void gameOver();
-    void resetGame();
+    void restartGame();
     void resetShip();
 
     void checkInputStart();
@@ -55,10 +57,10 @@ public:
 
     void inputCheck(float dt);
 
-    void checkWave();
-
     void update(float dt);
 
+    void checkWave();
+    void checkShipGracePeriod();
     void checkCollisions();
 
     void draw();

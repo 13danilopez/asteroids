@@ -10,8 +10,10 @@ Game::Game()
         wave{0}, 
         last_bullet_time{0},
         last_gameover_time{0},
+        last_ship_grace_time{0},
         score{0},
         score_mult{1},
+        lives{MAX_LIVES},
         running{true}
 {}
 
@@ -107,13 +109,14 @@ void Game::shootBullet()
     n_bullets++;
 }
 
-void Game::resetGame()
+void Game::restartGame()
 {
     n_asteroids = 0;
     n_bullets = 0;
     wave = 0;
     score = 0;
     score_mult = 1;
+    lives = MAX_LIVES;
     running = true;
 }
 
@@ -121,7 +124,7 @@ void Game::checkInputStart()
 {
     if (IsKeyDown(KEY_LEFT) || IsKeyDown(KEY_RIGHT)|| IsKeyDown(KEY_UP) || IsKeyDown(KEY_SPACE))
     {
-        resetGame();
+        restartGame();
     }
 }
 
@@ -168,7 +171,17 @@ void Game::checkCollisionShipAsteroid()
             CheckCollisionCircleLine(asteroid.getPos(), asteroid.getRadius(), ship.getVertices()[1], ship.getVertices()[2]) ||
             CheckCollisionCircleLine(asteroid.getPos(), asteroid.getRadius(), ship.getVertices()[2], ship.getVertices()[0]))
         {
-            gameOver();
+            lives--;
+            if (lives > 0) 
+            { 
+                resetShip();
+                ship.setInvulnerable(true);
+                last_ship_grace_time = GetTime();
+            }
+            else 
+            {
+                gameOver();
+            }
         }
     }
 }
@@ -191,32 +204,6 @@ void Game::inputCheck(float dt)
     }
 }
 
-// WAVE STATUS CHECK METHOD
-void Game::checkWave()
-{
-    if (!running) { return; }
-    if (n_asteroids == 0)
-    {
-        wave++;
-        if (wave > 1) 
-        { 
-            score += WAVE_CLEAR_BONUS * score_mult;
-            score_mult += WAVE_SCORE_MULTIPLIER;
-        }
-        unsigned int wave_asteroids = (unsigned int) (std::sqrt(wave) * WAVE_ASTEROID_MULTIPLIER);
-        generateNextWave(wave_asteroids);
-    }
-}
-
-// COLLISION CHECK METHOD (GENERAL)
-void Game::checkCollisions()
-{
-    if (!running) { return; }
-    checkCollisionBulletsEdge();
-    checkCollisionBulletsAsteroid();
-    checkCollisionShipAsteroid();
-}
-
 // UPDATE METHOD
 void Game::update(float dt)
 {
@@ -233,6 +220,47 @@ void Game::update(float dt)
      //std::cout << "n_bullets: " << n_bullets << std::endl;
 }
 
+// WAVE STATUS CHECK METHOD
+void Game::checkWave()
+{
+    if (!running) { return; }
+    if (n_asteroids == 0)
+    {
+        wave++;
+        if (wave > 1) 
+        { 
+            score += WAVE_CLEAR_BONUS * score_mult;
+            score_mult += WAVE_SCORE_MULTIPLIER;
+        }
+        if (lives < MAX_LIVES)
+        {
+            lives++;
+        }
+        unsigned int wave_asteroids = (unsigned int) (std::sqrt(wave) * WAVE_ASTEROID_MULTIPLIER);
+        generateNextWave(wave_asteroids);
+    }
+}
+
+// SHIP GRACE PERIOD CHECK METHOD
+void Game::checkShipGracePeriod()
+{
+    if (!running) { return; }
+    double current_time = GetTime();
+    if (current_time - last_ship_grace_time >= SHIP_GRACE_PERIOD)
+    {
+        ship.setInvulnerable(false);
+    }
+}
+
+// COLLISION CHECK METHOD (GENERAL)
+void Game::checkCollisions()
+{
+    if (!running) { return; }
+    checkCollisionBulletsEdge();
+    checkCollisionBulletsAsteroid();
+    if (!ship.isInvulnerable()) checkCollisionShipAsteroid();
+}
+
 // DRAW METHOD
 void Game::draw()
 {
@@ -244,9 +272,11 @@ void Game::draw()
     for (size_t i = 0; i < n_asteroids; ++i) { asteroids[i].draw(); }
     // Bullets
     for (size_t i = 0; i < n_bullets; ++i) { bullets[i].draw(); }
-    // Wave and score
+    // Wave, Score and Lives
     DrawText(TextFormat("wave: %u", wave), WINDOW_TEXT_MARGIN, WINDOW_TEXT_MARGIN, FONT_SIZE, WHITE);
-    DrawText(TextFormat("score: %u", score), WINDOW_TEXT_MARGIN, WINDOW_TEXT_MARGIN*3, FONT_SIZE, WHITE);
+    DrawText(TextFormat("score: %u", score), WINDOW_TEXT_MARGIN, WINDOW_TEXT_MARGIN + TEXT_MARGIN, FONT_SIZE, WHITE);
+    DrawText(TextFormat("lives: %u", lives), WINDOW_TEXT_MARGIN, WINDOW_TEXT_MARGIN + 2*TEXT_MARGIN, FONT_SIZE, WHITE);
+
     if (!running) 
     { 
         int gameover_text_width = MeasureText("GAME OVER", GAMEOVER_FONT_SIZE);

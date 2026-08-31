@@ -13,7 +13,8 @@ Spaceship::Spaceship(Vector2 pos)
                         pos.y - std::cos(angle + 2.5f) * SHIP_SIZE },
             (Vector2) { pos.x + std::sin(angle - 2.5f) * SHIP_SIZE,
                         pos.y - std::cos(angle - 2.5f) * SHIP_SIZE }
-        }
+        },
+        invulnerable{false}
 {}
 
 // GETTERS
@@ -29,6 +30,7 @@ void Spaceship::setVelocity(Vector2 nv) { velocity = nv; }
 void Spaceship::setVelocity_x(float nv_x) { velocity.x = nv_x; }
 void Spaceship::setVelocity_y(float nv_y) { velocity.y = nv_y; }
 void Spaceship::setAngle(float na) { angle = na; }
+void Spaceship::setInvulnerable(bool ni) { invulnerable = ni; }
 
 // PRIVATE METHODS
 void Spaceship::limitShipVelocity()
@@ -72,6 +74,11 @@ void Spaceship::wrapShip()
 }
 
 // PUBLIC METHODS
+bool Spaceship::isInvulnerable()
+{
+    return invulnerable;
+}
+
 void Spaceship::rotateLeft(float dt)
 {
     angle -= SHIP_STEER_POWER * dt;

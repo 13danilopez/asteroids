@@ -17,6 +17,7 @@ int main()
 {
     InitWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "asteroids");
     SetTargetFPS(60);
+    HideCursor();
 
     Game game;
 
@@ -30,10 +31,12 @@ int main()
         // 1- EVENT HANDLING (READ INPUT)
         game.inputCheck(dt);
         // 2- UPDATE GAMESTATE
-        game.checkWave();
         game.update(dt);
+        // 3- STATE CHECKS
+        game.checkWave();
+        game.checkShipGracePeriod();
         game.checkCollisions();
-        // 3- DRAW OBJECTS
+        // 4- DRAW OBJECTS
         game.draw();
     }
 

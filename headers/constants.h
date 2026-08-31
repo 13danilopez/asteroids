@@ -10,6 +10,7 @@
 #define SHIP_VELOCITY 0.05f
 #define SHIP_THRUST_POWER 100.0f
 #define SHIP_STEER_POWER 3.0f
+#define SHIP_GRACE_PERIOD 3.0f
 #define MAX_SHIP_SPEED 200.0f
 
 enum ASTEROID_SIZE { SMALL = 0, MEDIUM = 1, LARGE = 2 };
@@ -31,9 +32,12 @@ const std::array<unsigned int, 3> ASTEROID_VALUE { 10, 25, 50 };
 #define WAVE_CLEAR_BONUS 100
 
 #define WINDOW_TEXT_MARGIN 20
+#define TEXT_MARGIN 30
 #define FONT_SIZE 20
 
 #define GAMEOVER_FONT_SIZE 50
 #define GAMEOVER_COOLDOWN 1.0f
+
+#define MAX_LIVES 3
 
 #endif
