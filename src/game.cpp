@@ -10,15 +10,17 @@ Game::Game()
         wave{0}, 
         last_bullet_time{0},
         last_gameover_time{0},
+        score{0},
+        score_mult{1},
         running{true}
 {}
 
 // PRIVATE METHODS
-void Game::spawnAsteroid(Vector2 pos, int id, enum ASTEROID_SIZE size)
+void Game::spawnAsteroid(Vector2 pos, int id, float radius, unsigned int value)
 {
     Vector2 velocity = generateRandomVelocity();
     float angle = generateRandomAngle();
-    asteroids[id] = (Asteroid) {pos, velocity, angle, (float) size, id};
+    asteroids[id] = (Asteroid) {pos, velocity, angle, radius, value, id};
     n_asteroids++;
 }
     
@@ -27,29 +29,32 @@ void Game::generateNextWave(unsigned int wave_asteroids)
     for (size_t i = 0; i < wave_asteroids; ++i)
     {
         Vector2 pos = generateRandomPos(ship.getPos());
-        spawnAsteroid(pos, i, LARGE);
+        spawnAsteroid(pos, i, ASTEROID_RADIUS[LARGE], ASTEROID_VALUE[LARGE]);
     }
+}
+
+void Game::removeAsteroid(int id)
+{
+    asteroids[id] = asteroids[n_asteroids-1];
+    asteroids[id].setId(id);
+    n_asteroids--;
 }
 
 void Game::splitAsteroid(Asteroid& asteroid)
 {
     Vector2 pos = asteroid.getPos();
     float radius = asteroid.getRadius();
-    int id = asteroid.getId();
+    removeAsteroid(asteroid.getId());
 
-    asteroids[id] = asteroids[n_asteroids-1];
-    asteroids[id].setId(id);
-    n_asteroids--;
-
-    if (radius == LARGE)
+    if (radius == ASTEROID_RADIUS[LARGE])
     {
-        spawnAsteroid(pos, n_asteroids, MEDIUM);
-        spawnAsteroid(pos, n_asteroids, MEDIUM);
+        spawnAsteroid(pos, n_asteroids, ASTEROID_RADIUS[MEDIUM], ASTEROID_VALUE[MEDIUM]);
+        spawnAsteroid(pos, n_asteroids, ASTEROID_RADIUS[MEDIUM], ASTEROID_VALUE[MEDIUM]);
     }
-    else if (radius == MEDIUM)
+    else if (radius == ASTEROID_RADIUS[MEDIUM])
     {
-        spawnAsteroid(pos, n_asteroids, SMALL);
-        spawnAsteroid(pos, n_asteroids, SMALL);
+        spawnAsteroid(pos, n_asteroids, ASTEROID_RADIUS[SMALL], ASTEROID_VALUE[SMALL]);
+        spawnAsteroid(pos, n_asteroids, ASTEROID_RADIUS[SMALL], ASTEROID_VALUE[SMALL]);
     }
 }
 
@@ -107,6 +112,8 @@ void Game::resetGame()
     n_asteroids = 0;
     n_bullets = 0;
     wave = 0;
+    score = 0;
+    score_mult = 1;
     running = true;
 }
 
@@ -131,6 +138,7 @@ void Game::checkCollisionBulletsAsteroid()
             {
                 bullets[i] = bullets[n_bullets-1];
                 n_bullets--;
+                score += asteroid.getValue() * score_mult;
                 splitAsteroid(asteroid);
             }
         }
@@ -190,8 +198,12 @@ void Game::checkWave()
     if (n_asteroids == 0)
     {
         wave++;
-        unsigned int wave_asteroids = (unsigned int) (std::sqrt(wave) * WAVE_MULTIPLIER);
-        //bullets.reset(); ???
+        if (wave > 1) 
+        { 
+            score += WAVE_CLEAR_BONUS * score_mult;
+            score_mult += WAVE_SCORE_MULTIPLIER;
+        }
+        unsigned int wave_asteroids = (unsigned int) (std::sqrt(wave) * WAVE_ASTEROID_MULTIPLIER);
         generateNextWave(wave_asteroids);
     }
 }
@@ -232,8 +244,9 @@ void Game::draw()
     for (size_t i = 0; i < n_asteroids; ++i) { asteroids[i].draw(); }
     // Bullets
     for (size_t i = 0; i < n_bullets; ++i) { bullets[i].draw(); }
-    // Wave number
+    // Wave and score
     DrawText(TextFormat("wave: %u", wave), WINDOW_TEXT_MARGIN, WINDOW_TEXT_MARGIN, FONT_SIZE, WHITE);
+    DrawText(TextFormat("score: %u", score), WINDOW_TEXT_MARGIN, WINDOW_TEXT_MARGIN*3, FONT_SIZE, WHITE);
     if (!running) 
     { 
         int gameover_text_width = MeasureText("GAME OVER", GAMEOVER_FONT_SIZE);

@@ -24,10 +24,13 @@ protected:
     unsigned int wave;
     double last_bullet_time;
     double last_gameover_time;
+    unsigned int score;
+    float score_mult;
     bool running;
 
 private:
-    void spawnAsteroid(Vector2 pos, int id, enum ASTEROID_SIZE size);
+    void spawnAsteroid(Vector2 pos, int id, float size, unsigned int value);
+    void removeAsteroid(int id);
     void splitAsteroid(Asteroid& asteroid);
     
     void generateNextWave(unsigned int wave_asteroids);

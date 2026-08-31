@@ -1,6 +1,8 @@
 #ifndef CONSTANTS_H
 #define CONSTANTS_H
 
+#include <array>
+
 #define WINDOW_WIDTH 800
 #define WINDOW_HEIGHT 600
 
@@ -10,7 +12,9 @@
 #define SHIP_STEER_POWER 3.0f
 #define MAX_SHIP_SPEED 200.0f
 
-enum ASTEROID_SIZE { SMALL = 15, MEDIUM = 30, LARGE = 60 };
+enum ASTEROID_SIZE { SMALL = 0, MEDIUM = 1, LARGE = 2 };
+const std::array<float, 3> ASTEROID_RADIUS { 15.0f, 30.0f, 60.0f };
+const std::array<unsigned int, 3> ASTEROID_VALUE { 10, 25, 50 };
 #define ASTEROID_MIN_VELOCITY 20.0f
 #define ASTEROID_MAX_VELOCITY 70.0f
 #define ASTEROID_SPAWN_MARGIN 40
@@ -22,7 +26,9 @@ enum ASTEROID_SIZE { SMALL = 15, MEDIUM = 30, LARGE = 60 };
 #define BULLET_COOLDOWN 0.25f
 #define MAX_BULLET_NUMBER 32
 
-#define WAVE_MULTIPLIER 3
+#define WAVE_ASTEROID_MULTIPLIER 3
+#define WAVE_SCORE_MULTIPLIER 1.2f
+#define WAVE_CLEAR_BONUS 100
 
 #define WINDOW_TEXT_MARGIN 20
 #define FONT_SIZE 20

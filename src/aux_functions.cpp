@@ -34,7 +34,6 @@ Vector2 generateRandomPos(Vector2 ship_pos)
 
 Vector2 generateRandomVelocity()
 {
-    // TODO: generate velocity with POSITIVE or NEGATIVE sign
     std::random_device dev;
     std::mt19937 rng(dev());
     std::uniform_real_distribution<float> dist(ASTEROID_MIN_VELOCITY, ASTEROID_MAX_VELOCITY);

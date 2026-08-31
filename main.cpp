@@ -23,9 +23,11 @@ int main()
     while (!WindowShouldClose())
     {
         float dt = GetFrameTime();
+        /*
+         * player inputs modify the ships ANGLE and VELOCITY. POSITION and VERTICES 
+         *  are just updated on its own every frame through the .update() method
+         */
         // 1- EVENT HANDLING (READ INPUT)
-            /* player inputs modify the ships ANGLE and VELOCITY.
-               POSITION and VERTICES are just updated on its own every frame (.update()) */
         game.inputCheck(dt);
         // 2- UPDATE GAMESTATE
         game.checkWave();

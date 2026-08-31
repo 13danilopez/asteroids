@@ -10,7 +10,7 @@
 class Spaceship
 {
 protected:
-    Vector2 pos;
+    Vector2 pos; // Represents the center of the triangle
     Vector2 velocity;
     float angle;
     std::array<Vector2,3> vertices;
