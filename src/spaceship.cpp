@@ -4,7 +4,7 @@
 Spaceship::Spaceship(Vector2 pos)
     :   pos{pos},
         velocity{(Vector2) {0.0f, 0.0f}},
-        angle{0.0f},            // Angle: 0..2pi => 1 vuelta
+        angle{0.0f},            // angle: 0..2pi => 1 whole turn
         vertices
         {
             (Vector2) { pos.x + std::sin(angle) * SHIP_SIZE,
@@ -15,8 +15,7 @@ Spaceship::Spaceship(Vector2 pos)
                         pos.y - std::cos(angle - 2.5f) * SHIP_SIZE }
         },
         invulnerable{false},
-        color{WHITE},
-        last_blink_time{0}
+        invulnerability_timer{0.0f}
 {}
 
 // GETTERS
@@ -81,18 +80,10 @@ bool Spaceship::isInvulnerable()
     return invulnerable;
 }
 
-void Spaceship::blink()
+void Spaceship::startInvulnerability()
 {
-    if (!invulnerable) { color = WHITE; }
-    else
-    {
-        double current_time = GetTime();
-        if (current_time - last_blink_time >= SHIP_BLINK_FREQUENCY)
-        {
-            color = (ColorIsEqual(color, WHITE)) ? BLACK : WHITE;
-            last_blink_time = current_time;
-        }
-    }
+    invulnerable = true;
+    invulnerability_timer = SHIP_GRACE_PERIOD;
 }
 
 void Spaceship::rotateLeft(float dt)
@@ -115,6 +106,9 @@ void Spaceship::thrustForward(float dt)
 // UPDATE METHOD
 void Spaceship::update(float dt)
 {
+    // Update timer
+    if (invulnerability_timer >= 0.0f) { invulnerability_timer -= dt; }
+    else { invulnerable = false; }
     // Update center position
     pos.x += velocity.x * dt;
     pos.y -= velocity.y * dt;
@@ -132,7 +126,8 @@ void Spaceship::update(float dt)
 // DRAW METHOD
 void Spaceship::draw()
 {
-    DrawTriangleLines(vertices[0], vertices[1], vertices[2], color);
+    if (invulnerability_timer >= 0.0f && (static_cast<int>(GetTime() * SHIP_BLINK_DELAY) % 2 == 0)) { return; }
+    DrawTriangleLines(vertices[0], vertices[1], vertices[2], WHITE);
 
     // Object Debug Info
      //DrawCircleV(pos, 2.0f, RED);

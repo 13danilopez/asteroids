@@ -31,10 +31,10 @@ int main()
         // 1- EVENT HANDLING (READ INPUT)
         game.inputCheck(dt);
         // 2- UPDATE GAMESTATE
-        game.update(dt);
+        game.updateObjects(dt);
+        game.updateTimers(dt);
         // 3- STATE CHECKS
         game.checkWave();
-        game.checkShipGracePeriod();
         game.checkCollisions();
         // 4- DRAW OBJECTS
         game.draw();

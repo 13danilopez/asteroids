@@ -22,12 +22,12 @@ protected:
     size_t n_asteroids;
     size_t n_bullets;
     unsigned int wave;
-    double last_bullet_time;
-    double last_gameover_time;
-    double last_ship_grace_time;
     unsigned int score;
-    float score_mult;
     unsigned int lives;
+    float score_mult;
+    float bullet_cooldown_timer;
+    float gameover_timer;
+    float ship_respawn_timer;
     bool running;
 
 private:
@@ -41,9 +41,6 @@ private:
     void checkCollisionBulletsAsteroid();
     void checkCollisionShipAsteroid();
 
-    bool bulletCooldown();
-    bool gameOverCooldown();
-
     void shootBullet();
 
     void gameOver();
@@ -55,9 +52,12 @@ private:
 public:
     Game();
 
+    void init();
+
     void inputCheck(float dt);
 
-    void update(float dt);
+    void updateObjects(float dt);
+    void updateTimers(float dt);
 
     void checkWave();
     void checkShipGracePeriod();

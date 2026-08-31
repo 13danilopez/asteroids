@@ -11,7 +11,6 @@ protected:
     Vector2 pos;
     Vector2 velocity;
     float angle;
-    Color color;
 
 public:
     Bullet();

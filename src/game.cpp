@@ -3,17 +3,17 @@
 // CONSTRUCTOR
 Game::Game()
     :   ship((Vector2){WINDOW_WIDTH/2,WINDOW_HEIGHT/2}), 
-        asteroids{},  
+        asteroids{}, 
         bullets{}, 
-        n_asteroids{0},
+        n_asteroids{0}, 
         n_bullets{0}, 
         wave{0}, 
-        last_bullet_time{0},
-        last_gameover_time{0},
-        last_ship_grace_time{0},
-        score{0},
-        score_mult{1},
-        lives{MAX_LIVES},
+        score{0}, 
+        lives{MAX_LIVES}, 
+        score_mult{1.0f}, 
+        bullet_cooldown_timer{0.0f}, 
+        gameover_timer{0.0f}, 
+        ship_respawn_timer{0.0f}, 
         running{true}
 {}
 
@@ -69,34 +69,16 @@ void Game::resetShip()
 
 void Game::gameOver()
 {
+    gameover_timer = GAMEOVER_COOLDOWN;
+
     running = false;
-    last_gameover_time = GetTime();
     resetShip();
-}
-
-bool Game::bulletCooldown()
-{
-    double current_time = GetTime();
-    if (current_time - last_bullet_time >= BULLET_COOLDOWN)
-    {
-        last_bullet_time = current_time;
-        return true;
-    }
-    return false;
-}
-
-bool Game::gameOverCooldown()
-{
-    double current_time = GetTime();
-    if (current_time - last_gameover_time >= GAMEOVER_COOLDOWN)
-    {
-        return true;
-    }
-    return false;
 }
 
 void Game::shootBullet()
 {
+    bullet_cooldown_timer = BULLET_COOLDOWN;
+
     Vector2 ship_nose = ship.getNose();
     Vector2 ship_velocity = {
         std::sin(ship.getAngle()) * BULLET_SPEED,
@@ -166,7 +148,7 @@ void Game::checkCollisionShipAsteroid()
     for (size_t i = 0; i < n_asteroids; ++i)
     {
         Asteroid asteroid = asteroids[i];
-        // Check triangle-circle collision (all 3 lines of the triangle)
+        // check triangle-circle collision (all 3 lines of the triangle)
         if (CheckCollisionCircleLine(asteroid.getPos(), asteroid.getRadius(), ship.getVertices()[0], ship.getVertices()[1]) ||
             CheckCollisionCircleLine(asteroid.getPos(), asteroid.getRadius(), ship.getVertices()[1], ship.getVertices()[2]) ||
             CheckCollisionCircleLine(asteroid.getPos(), asteroid.getRadius(), ship.getVertices()[2], ship.getVertices()[0]))
@@ -175,8 +157,7 @@ void Game::checkCollisionShipAsteroid()
             if (lives > 0) 
             { 
                 resetShip();
-                ship.setInvulnerable(true);
-                last_ship_grace_time = GetTime();
+                ship.startInvulnerability();
             }
             else 
             {
@@ -190,22 +171,22 @@ void Game::checkCollisionShipAsteroid()
 // INPUT CHECK METHOD
 void Game::inputCheck(float dt)
 {
-    if (!running && gameOverCooldown()) { checkInputStart(); }
+    if (!running && gameover_timer <= 0.0f) { checkInputStart(); }
 
-    if (IsKeyDown(KEY_LEFT))  { ship.rotateLeft(dt); }
-    if (IsKeyDown(KEY_RIGHT)) { ship.rotateRight(dt); }
-    if (IsKeyDown(KEY_UP))    { ship.thrustForward(dt); }
+    if (IsKeyDown(KEY_LEFT)  || IsKeyDown(KEY_A)) { ship.rotateLeft(dt); }
+    if (IsKeyDown(KEY_RIGHT) || IsKeyDown(KEY_D)) { ship.rotateRight(dt); }
+    if (IsKeyDown(KEY_UP)    || IsKeyDown(KEY_W)) { ship.thrustForward(dt); }
     if (IsKeyDown(KEY_SPACE))
     {
-        if (n_bullets < MAX_BULLET_NUMBER && bulletCooldown())
+        if (n_bullets < MAX_BULLET_NUMBER && bullet_cooldown_timer <= 0.0f)
         {
             shootBullet();
         }
     }
 }
 
-// UPDATE METHOD
-void Game::update(float dt)
+// OBJECTS STATE UPDATE METHOD (can stop updating while !running)
+void Game::updateObjects(float dt)
 {
     if (!running) { return; }
     // Ship
@@ -214,10 +195,17 @@ void Game::update(float dt)
     for (size_t i = 0; i < n_asteroids; ++i) { asteroids[i].update(dt); }
     // Bullets
     for (size_t i = 0; i < n_bullets; ++i) { bullets[i].update(dt); }
-    
+
     // Object Debug Info
      //std::cout << "n_asteroids: " << n_asteroids << std::endl;
      //std::cout << "n_bullets: " << n_bullets << std::endl;
+}
+
+// TIMERS UPDATE METHOD (keep updating gameover_timer while !running)
+void Game::updateTimers(float dt)
+{
+    if (bullet_cooldown_timer > 0.0f)  { bullet_cooldown_timer -= dt; }
+    if (gameover_timer > 0.0f)         { gameover_timer -= dt; }
 }
 
 // WAVE STATUS CHECK METHOD
@@ -239,18 +227,6 @@ void Game::checkWave()
         unsigned int wave_asteroids = (unsigned int) (std::sqrt(wave) * WAVE_ASTEROID_MULTIPLIER);
         generateNextWave(wave_asteroids);
     }
-}
-
-// SHIP GRACE PERIOD CHECK METHOD
-void Game::checkShipGracePeriod()
-{
-    if (!running) { return; }
-    double current_time = GetTime();
-    if (current_time - last_ship_grace_time >= SHIP_GRACE_PERIOD)
-    {
-        ship.setInvulnerable(false);
-    }
-    ship.blink();
 }
 
 // COLLISION CHECK METHOD (GENERAL)
@@ -282,7 +258,7 @@ void Game::draw()
     { 
         int gameover_text_width = MeasureText("GAME OVER", GAMEOVER_FONT_SIZE);
         DrawText(TextFormat("GAME OVER"), WINDOW_WIDTH/2 - gameover_text_width/2, WINDOW_HEIGHT/2 - GAMEOVER_FONT_SIZE/2 - 40, GAMEOVER_FONT_SIZE, RED);
-        if (gameOverCooldown())
+        if (gameover_timer <= 0.0f)
         {
             int press_key_text_width = MeasureText("[press key to start]", FONT_SIZE);
             DrawText(TextFormat("[press key to start]"), WINDOW_WIDTH/2 - press_key_text_width/2, WINDOW_HEIGHT/2 - FONT_SIZE/2, FONT_SIZE, WHITE);

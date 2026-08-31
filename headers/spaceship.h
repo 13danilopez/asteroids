@@ -10,13 +10,12 @@
 class Spaceship
 {
 protected:
-    Vector2 pos; // Represents the center of the triangle
+    Vector2 pos; // represents the center of the triangle
     Vector2 velocity;
     float angle;
     std::array<Vector2,3> vertices;
     bool invulnerable;
-    Color color;
-    double last_blink_time;
+    float invulnerability_timer;
 
 private:
     void limitShipVelocity();
@@ -41,7 +40,7 @@ public:
 
     bool isInvulnerable();
 
-    void blink();
+    void startInvulnerability();
 
     void rotateLeft(float dt);
     void rotateRight(float dt);

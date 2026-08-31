@@ -7,8 +7,7 @@ Asteroid::Asteroid()
         angle{0.0f},
         radius{0.0f},
         value{0},
-        id{-1},
-        color{WHITE}
+        id{-1}
 {}
 
 Asteroid::Asteroid(Vector2 pos, Vector2 velocity, float angle, float radius, unsigned int value, int id)
@@ -17,8 +16,7 @@ Asteroid::Asteroid(Vector2 pos, Vector2 velocity, float angle, float radius, uns
         angle{angle},
         radius{radius},
         value{value},
-        id{id},
-        color{WHITE}
+        id{id}
 {}
 
 // GETTERS
@@ -46,7 +44,7 @@ void Asteroid::update(float dt)
 // DRAW METHOD
 void Asteroid::draw()
 {
-    DrawCircleLines(pos.x, pos.y, radius, color);
+    DrawCircleLines(pos.x, pos.y, radius, WHITE);
 
     // Object Debug Info
      //DrawText(TextFormat("asteroid angle: %f", angle), 20, 40, 20, WHITE);
