@@ -15,6 +15,8 @@ protected:
     float angle;
     std::array<Vector2,3> vertices;
     bool invulnerable;
+    Color color;
+    double last_blink_time;
 
 private:
     void limitShipVelocity();
@@ -38,6 +40,8 @@ public:
     void setInvulnerable(bool ns);
 
     bool isInvulnerable();
+
+    void blink();
 
     void rotateLeft(float dt);
     void rotateRight(float dt);

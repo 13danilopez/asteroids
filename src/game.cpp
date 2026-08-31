@@ -250,6 +250,7 @@ void Game::checkShipGracePeriod()
     {
         ship.setInvulnerable(false);
     }
+    ship.blink();
 }
 
 // COLLISION CHECK METHOD (GENERAL)

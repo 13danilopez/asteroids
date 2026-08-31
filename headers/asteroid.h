@@ -15,6 +15,7 @@ protected:
     float radius;
     unsigned int value;
     int id;
+    Color color;
 
 public:
     Asteroid();

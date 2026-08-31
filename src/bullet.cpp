@@ -2,13 +2,17 @@
 
 // CONSTRUCTOTS
 Bullet::Bullet()
-    : pos{0.0f, 0.0f},
-      velocity{0.0f, 0.0f},
-      angle{0.0f}
+    :   pos{0.0f, 0.0f},
+        velocity{0.0f, 0.0f},
+        angle{0.0f},
+        color{WHITE}
 {}
 
 Bullet::Bullet(Vector2 pos, Vector2 velocity, float angle)
-    : pos{pos}, velocity{velocity}, angle{angle}
+    :   pos{pos}, 
+        velocity{velocity}, 
+        angle{angle}, 
+        color{WHITE}
 {}
 
 // GETTERS
@@ -24,5 +28,5 @@ void Bullet::update(float dt)
 // DRAW METHOD
 void Bullet::draw()
 {
-    DrawCircleV(pos, BULLET_RADIUS, WHITE);
+    DrawCircleV(pos, BULLET_RADIUS, color);
 }
